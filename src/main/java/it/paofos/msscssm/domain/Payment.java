@@ -1,0 +1,27 @@
+package it.paofos.msscssm.domain;
+
+import java.math.BigDecimal;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+public class Payment {
+
+	private Long id;
+	
+	// This creates a varchar field containing the name of the enum value
+	@Enumerated(EnumType.STRING)
+	private PaymentState state;
+	
+	private BigDecimal amount;
+}
