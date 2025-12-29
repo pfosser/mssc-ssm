@@ -2,12 +2,10 @@ package it.paofos.msscssm.service;
 
 import org.springframework.stereotype.Service;
 
-import com.github.oxo42.stateless4j.StateMachine;
-
 import it.paofos.msscssm.config.StateMachineFactory;
 import it.paofos.msscssm.domain.Payment;
-import it.paofos.msscssm.domain.PaymentEvent;
 import it.paofos.msscssm.domain.PaymentState;
+import it.paofos.msscssm.domain.PaymentStateMachine;
 import it.paofos.msscssm.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -26,21 +24,29 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	@Override
-	public StateMachine<PaymentState, PaymentEvent> preAuth(Long paymentId) {
-		// TODO Auto-generated method stub
+	public PaymentStateMachine preAuth(Long paymentId) {
+		PaymentStateMachine sm = build(paymentId);
 		return null;
 	}
 
 	@Override
-	public StateMachine<PaymentState, PaymentEvent> authorizePayment(Long paymentId) {
-		// TODO Auto-generated method stub
+	public PaymentStateMachine authorizePayment(Long paymentId) {
+		PaymentStateMachine sm = build(paymentId);
 		return null;
 	}
 
 	@Override
-	public StateMachine<PaymentState, PaymentEvent> declineAuth(Long paymentId) {
-		// TODO Auto-generated method stub
+	public PaymentStateMachine declineAuth(Long paymentId) {
+		PaymentStateMachine sm = build(paymentId);
 		return null;
+	}
+	
+	private PaymentStateMachine build(Long paymentId) {
+		Payment payment = paymentRepository.getReferenceById(paymentId);
+		
+		PaymentStateMachine sm = stateMachineFactory.getStateMachine(paymentId, payment.getState());
+		
+		return sm;
 	}
 
 }
