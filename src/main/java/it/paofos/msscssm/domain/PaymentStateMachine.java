@@ -1,5 +1,7 @@
 package it.paofos.msscssm.domain;
 
+import org.springframework.messaging.Message;
+
 import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
 
@@ -18,6 +20,10 @@ public class PaymentStateMachine extends StateMachine<PaymentState, PaymentEvent
 	}
 	public PaymentStateMachine(PaymentState initialState, StateMachineConfig<PaymentState, PaymentEvent> config) {
 		super(initialState, config);
+	}
+
+	public void fire(Message<PaymentEvent> msg) {
+		
 	}
 
 }
