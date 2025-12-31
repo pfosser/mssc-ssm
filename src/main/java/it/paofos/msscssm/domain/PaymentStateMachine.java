@@ -1,29 +1,24 @@
 package it.paofos.msscssm.domain;
 
-import org.springframework.messaging.Message;
-
 import com.github.oxo42.stateless4j.StateMachine;
-import com.github.oxo42.stateless4j.StateMachineConfig;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class PaymentStateMachine extends StateMachine<PaymentState, PaymentEvent> {
+@RequiredArgsConstructor
+public class PaymentStateMachine {
 	
-	private Long id;
+	private final Long id;
+	private final StateMachine<PaymentState, PaymentEvent> machine;
 
-	public PaymentStateMachine(Long id, PaymentState initialState, StateMachineConfig<PaymentState, PaymentEvent> config) {
-		this(initialState, config);
-		this.id = id;
-	}
-	public PaymentStateMachine(PaymentState initialState, StateMachineConfig<PaymentState, PaymentEvent> config) {
-		super(initialState, config);
+	public void preAuthorize() {
+		machine.fire(PaymentEvent.PRE_AUTHORIZE);
 	}
 
-	public void fire(Message<PaymentEvent> msg) {
-		
+	public void authorizePayment() {
+		machine.fire(PaymentEvent.AUTH_APPROVED);
 	}
 
+	public void declineAuth() {
+		machine.fire(PaymentEvent.AUTH_DECLINED);
+	}
 }

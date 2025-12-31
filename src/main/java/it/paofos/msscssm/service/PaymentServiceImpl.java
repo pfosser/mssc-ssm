@@ -1,12 +1,9 @@
 package it.paofos.msscssm.service;
 
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import it.paofos.msscssm.config.StateMachineFactory;
 import it.paofos.msscssm.domain.Payment;
-import it.paofos.msscssm.domain.PaymentEvent;
 import it.paofos.msscssm.domain.PaymentState;
 import it.paofos.msscssm.domain.PaymentStateMachine;
 import it.paofos.msscssm.repository.PaymentRepository;
@@ -32,7 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
 	public PaymentStateMachine preAuth(Long paymentId) {
 		PaymentStateMachine sm = build(paymentId);
 		
-		sendEvent(paymentId, sm, PaymentEvent.PRE_AUTHORIZE);
+		sm.preAuthorize();
 
 		return null;
 	}
@@ -41,7 +38,7 @@ public class PaymentServiceImpl implements PaymentService {
 	public PaymentStateMachine authorizePayment(Long paymentId) {
 		PaymentStateMachine sm = build(paymentId);
 		
-		sendEvent(paymentId, sm, PaymentEvent.AUTH_APPROVED);
+		sm.authorizePayment();
 
 		return null;
 	}
@@ -50,17 +47,9 @@ public class PaymentServiceImpl implements PaymentService {
 	public PaymentStateMachine declineAuth(Long paymentId) {
 		PaymentStateMachine sm = build(paymentId);
 		
-		sendEvent(paymentId, sm, PaymentEvent.AUTH_DECLINED);
+		sm.declineAuth();
 
 		return null;
-	}
-
-	private void sendEvent(Long paymentId, PaymentStateMachine sm, PaymentEvent event) {
-		Message<PaymentEvent> msg = MessageBuilder.withPayload(event) //
-			.setHeader(PAYMENT_ID_HEADER, paymentId) //
-			.build();
-		
-		sm.fire(msg);
 	}
 
 	private PaymentStateMachine build(Long paymentId) {
