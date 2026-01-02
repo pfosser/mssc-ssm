@@ -11,7 +11,7 @@ public class PaymentStateMachine {
 	private final StateMachine<PaymentState, PaymentEvent> machine;
 
 	public void preAuthorize() {
-		machine.fire(PaymentEvent.PRE_AUTHORIZE);
+		machine.fire(PaymentEvent.PRE_AUTH_APPROVED);
 	}
 
 	public void authorizePayment() {
@@ -20,5 +20,9 @@ public class PaymentStateMachine {
 
 	public void declineAuth() {
 		machine.fire(PaymentEvent.AUTH_DECLINED);
+	}
+	
+	public PaymentState getState() {
+		return machine.getState();
 	}
 }

@@ -7,6 +7,7 @@ import it.paofos.msscssm.domain.Payment;
 import it.paofos.msscssm.domain.PaymentState;
 import it.paofos.msscssm.domain.PaymentStateMachine;
 import it.paofos.msscssm.repository.PaymentRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -25,31 +26,34 @@ public class PaymentServiceImpl implements PaymentService {
 		return paymentRepository.save(payment);
 	}
 
+	@Transactional
 	@Override
 	public PaymentStateMachine preAuth(Long paymentId) {
 		PaymentStateMachine sm = build(paymentId);
 		
 		sm.preAuthorize();
 
-		return null;
+		return sm;
 	}
 
+	@Transactional
 	@Override
 	public PaymentStateMachine authorizePayment(Long paymentId) {
 		PaymentStateMachine sm = build(paymentId);
 		
 		sm.authorizePayment();
 
-		return null;
+		return sm;
 	}
 
+	@Transactional
 	@Override
 	public PaymentStateMachine declineAuth(Long paymentId) {
 		PaymentStateMachine sm = build(paymentId);
 		
 		sm.declineAuth();
 
-		return null;
+		return sm;
 	}
 
 	private PaymentStateMachine build(Long paymentId) {

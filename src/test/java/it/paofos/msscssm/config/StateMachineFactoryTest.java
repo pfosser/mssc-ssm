@@ -4,10 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.github.oxo42.stateless4j.StateMachine;
-
-import it.paofos.msscssm.domain.PaymentEvent;
-import it.paofos.msscssm.domain.PaymentState;
+import it.paofos.msscssm.domain.PaymentStateMachine;
 
 @SpringBootTest
 class StateMachineFactoryTest {
@@ -17,19 +14,19 @@ class StateMachineFactoryTest {
 	
 	@Test
 	void testNewStateMachine() {
-		StateMachine<PaymentState, PaymentEvent> sm = factory.create();
+		PaymentStateMachine sm = factory.create();
 		
 		System.out.println(sm.getState().toString());
 		
-		sm.fire(PaymentEvent.PRE_AUTHORIZE);
+		sm.preAuthorize();
 
 		System.out.println(sm.getState().toString());
 		
-		sm.fire(PaymentEvent.PRE_AUTH_APPROVED);
+		sm.preAuthorize();
 
 		System.out.println(sm.getState().toString());
 		
-		sm.fire(PaymentEvent.PRE_AUTH_DECLINED);
+		sm.declineAuth();
 
 		System.out.println(sm.getState().toString());
 	}

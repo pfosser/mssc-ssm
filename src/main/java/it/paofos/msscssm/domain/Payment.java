@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ import lombok.NoArgsConstructor;
 public class Payment {
 
 	@Id
+	@GeneratedValue
 	private Long id;
 	
 	// This creates a varchar field containing the name of the enum value
