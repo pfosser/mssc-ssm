@@ -1,5 +1,8 @@
 package it.paofos.msscssm.config;
 
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.springframework.stereotype.Component;
 
 import com.github.oxo42.stateless4j.StateConfiguration;
@@ -27,9 +30,18 @@ public class StateMachineFactory {
 
 	private PaymentStateMachine internalCreate(Long id, PaymentState initialState) {
 		StateMachineConfig<PaymentState, PaymentEvent> paymentConfig = new StateMachineConfig<>();
+		
+		AtomicBoolean authEval = new AtomicBoolean();
 
 		StateConfiguration<PaymentState, PaymentEvent> stateConfig = paymentConfig.configure(PaymentState.NEW) //
-				.ignore(PaymentEvent.PRE_AUTHORIZE) //
+				.permitIf(PaymentEvent.PRE_AUTHORIZE, PaymentState.PRE_AUTH, () -> {
+					authEval.set(new Random().nextInt(10) < 8);
+					System.out.println("PreAuth was called: " + (authEval.get() ? "approved" : "declined, no credit"));
+					return authEval.get();
+				}) //
+				.permitIf(PaymentEvent.PRE_AUTHORIZE, PaymentState.PRE_AUTH_ERROR, () -> {
+					return !authEval.get();
+				}) //
 				.permit(PaymentEvent.PRE_AUTH_APPROVED, PaymentState.PRE_AUTH) //
 				.permit(PaymentEvent.PRE_AUTH_DECLINED, PaymentState.PRE_AUTH_ERROR);
 
