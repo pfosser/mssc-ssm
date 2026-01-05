@@ -1,15 +1,18 @@
 package it.paofos.msscssm.service;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.github.oxo42.stateless4j.StateMachine;
+
 import it.paofos.msscssm.domain.Payment;
+import it.paofos.msscssm.domain.PaymentEvent;
+import it.paofos.msscssm.domain.PaymentState;
 import it.paofos.msscssm.domain.PaymentStateMachine;
 import it.paofos.msscssm.repository.PaymentRepository;
 import jakarta.transaction.Transactional;
@@ -41,11 +44,28 @@ class PaymentServiceImplTest {
 		PaymentStateMachine sm = paymentService.preAuth(savedPayment.getId());
 
 		Payment preAuthedPayment = paymentRepository.getReferenceById(savedPayment.getId());
-		
+
 		System.out.println("Should be PRE_AUTH or PRE_AUTH_ERROR");
 		System.out.println(sm.getState());
 
 		System.out.println(preAuthedPayment);
 	}
 
+	@Transactional
+	@RepeatedTest(10)
+	void testAuth() {
+		Payment savedPayment = paymentService.newPayment(payment);
+
+		PaymentStateMachine preAuthSM = paymentService.preAuth(savedPayment.getId());
+
+		if (preAuthSM.getState() == PaymentState.PRE_AUTH) {
+			System.out.println("Payment is Pre Authorized");
+
+			PaymentStateMachine authSM = paymentService.authorizePayment(savedPayment.getId());
+
+			System.out.println("Result of Auth: " + authSM.getState());
+		} else {
+			System.out.println("Payment failed pre-auth...");
+		}
+	}
 }

@@ -30,26 +30,45 @@ public class StateMachineFactory {
 
 	private PaymentStateMachine internalCreate(Long id, PaymentState initialState) {
 		StateMachineConfig<PaymentState, PaymentEvent> paymentConfig = new StateMachineConfig<>();
-		
-		AtomicBoolean authEval = new AtomicBoolean();
 
-		StateConfiguration<PaymentState, PaymentEvent> stateConfig = paymentConfig.configure(PaymentState.NEW) //
-				.permitIf(PaymentEvent.PRE_AUTHORIZE, PaymentState.PRE_AUTH, () -> {
-					authEval.set(new Random().nextInt(10) < 8);
-					System.out.println("PreAuth was called: " + (authEval.get() ? "approved" : "declined, no credit"));
-					return authEval.get();
-				}) //
-				.permitIf(PaymentEvent.PRE_AUTHORIZE, PaymentState.PRE_AUTH_ERROR, () -> {
-					return !authEval.get();
-				}) //
-				.permit(PaymentEvent.PRE_AUTH_APPROVED, PaymentState.PRE_AUTH) //
-				.permit(PaymentEvent.PRE_AUTH_DECLINED, PaymentState.PRE_AUTH_ERROR);
+		AtomicBoolean preAuthEval = new AtomicBoolean();
 
+		StateConfiguration<PaymentState, PaymentEvent> stateConfig = paymentConfig.configure(PaymentState.NEW); //
+		stateConfig = stateConfig.permitIf(PaymentEvent.PRE_AUTHORIZE, PaymentState.PRE_AUTH, () -> {
+			preAuthEval.set(new Random().nextInt(10) < 8);
+			System.out.println("PreAuth was called: " + (preAuthEval.get() ? "approved" : "declined, no credit"));
+			return preAuthEval.get();
+		}); //
 		addTransitionLog(stateConfig);
 		addPersistence(id, stateConfig);
 
-		stateConfig = paymentConfig.configure(PaymentState.PRE_AUTH) //
-				.ignore(PaymentEvent.PRE_AUTH_DECLINED);
+		stateConfig = stateConfig.permitIf(PaymentEvent.PRE_AUTHORIZE, PaymentState.PRE_AUTH_ERROR, () -> {
+			return !preAuthEval.get();
+		}); //
+		addTransitionLog(stateConfig);
+		addPersistence(id, stateConfig);
+
+		stateConfig = stateConfig.permit(PaymentEvent.PRE_AUTH_APPROVED, PaymentState.PRE_AUTH); //
+		addTransitionLog(stateConfig);
+		addPersistence(id, stateConfig);
+
+		stateConfig = stateConfig.permit(PaymentEvent.PRE_AUTH_DECLINED, PaymentState.PRE_AUTH_ERROR);
+		addTransitionLog(stateConfig);
+		addPersistence(id, stateConfig);
+		
+
+		AtomicBoolean authEval = new AtomicBoolean();
+
+		stateConfig = paymentConfig.configure(PaymentState.PRE_AUTH); //
+
+		stateConfig = stateConfig.permitIf(PaymentEvent.AUTHORIZE, PaymentState.AUTH, () -> {
+			authEval.set(new Random().nextInt(10) < 8);
+			System.out.println("Auth was called: " + (authEval.get() ? "approved" : "declined, no credit"));
+			return authEval.get();
+		}); //
+		stateConfig = stateConfig.permitIf(PaymentEvent.AUTHORIZE, PaymentState.AUTH_ERROR, () -> {
+			return !authEval.get();
+		}); //
 
 		addTransitionLog(stateConfig);
 		addPersistence(id, stateConfig);

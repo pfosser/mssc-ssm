@@ -10,6 +10,4 @@ public interface PaymentService {
 	PaymentStateMachine preAuth(Long paymentId);
 	
 	PaymentStateMachine authorizePayment(Long paymentId);
-	
-	PaymentStateMachine declineAuth(Long paymentId);
 }

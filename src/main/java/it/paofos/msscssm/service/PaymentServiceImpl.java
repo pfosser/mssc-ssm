@@ -46,16 +46,6 @@ public class PaymentServiceImpl implements PaymentService {
 		return sm;
 	}
 
-	@Transactional
-	@Override
-	public PaymentStateMachine declineAuth(Long paymentId) {
-		PaymentStateMachine sm = build(paymentId);
-		
-		sm.declineAuth();
-
-		return sm;
-	}
-
 	private PaymentStateMachine build(Long paymentId) {
 		Payment payment = paymentRepository.getReferenceById(paymentId);
 

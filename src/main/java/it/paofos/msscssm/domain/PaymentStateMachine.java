@@ -15,13 +15,9 @@ public class PaymentStateMachine {
 	}
 
 	public void authorizePayment() {
-		machine.fire(PaymentEvent.AUTH_APPROVED);
+		machine.fire(PaymentEvent.AUTHORIZE);
 	}
 
-	public void declineAuth() {
-		machine.fire(PaymentEvent.AUTH_DECLINED);
-	}
-	
 	public PaymentState getState() {
 		return machine.getState();
 	}

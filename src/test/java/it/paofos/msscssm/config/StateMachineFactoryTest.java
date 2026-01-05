@@ -26,9 +26,6 @@ class StateMachineFactoryTest {
 
 		System.out.println(sm.getState().toString());
 		
-		sm.declineAuth();
-
-		System.out.println(sm.getState().toString());
 	}
 
 }
